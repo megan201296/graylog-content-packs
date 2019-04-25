@@ -1,0 +1,179 @@
+{
+  "v": 1,
+  "id": "74b3aa6b-16f9-4afa-981a-e352e7790e1d",
+  "rev": 1,
+  "name": "XFE IP Risk Score",
+  "summary": "XFE IP Risk Score",
+  "description": "",
+  "vendor": "megansroddie@gmail.com",
+  "url": "",
+  "parameters": [
+    {
+      "name": "auth_header",
+      "title": "Authorization Header",
+      "description": "Authorization Header",
+      "type": "string",
+      "default_value": ""
+    }
+  ],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_cache",
+        "version": "1"
+      },
+      "id": "7fa6fa15-dcf1-4326-a353-81ae38e5ac3f",
+      "data": {
+        "name": {
+          "@type": "string",
+          "@value": "xfe-ip-risk-score"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "XFE IP Risk Score"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "XFE IP Risk Score"
+        },
+        "configuration": {
+          "type": {
+            "@type": "string",
+            "@value": "guava_cache"
+          },
+          "max_size": {
+            "@type": "integer",
+            "@value": 1000
+          },
+          "expire_after_access": {
+            "@type": "long",
+            "@value": 60
+          },
+          "expire_after_access_unit": {
+            "@type": "string",
+            "@value": "SECONDS"
+          },
+          "expire_after_write": {
+            "@type": "long",
+            "@value": 0
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_adapter",
+        "version": "1"
+      },
+      "id": "9d5a063e-d70c-4aef-beed-b30443988cd7",
+      "data": {
+        "name": {
+          "@type": "string",
+          "@value": "xfe-ip-risk-score"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "XFE IP Risk Score"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "XFE IP Reputation"
+        },
+        "configuration": {
+          "type": {
+            "@type": "string",
+            "@value": "httpjsonpath"
+          },
+          "url": {
+            "@type": "string",
+            "@value": "https://api.xforce.ibmcloud.com/ipr/${key}"
+          },
+          "single_value_jsonpath": {
+            "@type": "string",
+            "@value": "$.score"
+          },
+          "multi_value_jsonpath": {
+            "@type": "string",
+            "@value": "$.score"
+          },
+          "user_agent": {
+            "@type": "string",
+            "@value": "Graylog Lookup - https://www.graylog.org/"
+          },
+          "headers": {
+            "Authorization": {
+              "@value": "auth_header",
+              "@type": "parameter"
+            }
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_table",
+        "version": "1"
+      },
+      "id": "765df995-188b-44dd-b29a-ac9d08b255d5",
+      "data": {
+        "default_single_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "cache_name": {
+          "@type": "string",
+          "@value": "7fa6fa15-dcf1-4326-a353-81ae38e5ac3f"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "xfe-ip-risk-score"
+        },
+        "default_multi_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "default_multi_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "data_adapter_name": {
+          "@type": "string",
+          "@value": "9d5a063e-d70c-4aef-beed-b30443988cd7"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "XFE IP Risk Score"
+        },
+        "default_single_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "description": {
+          "@type": "string",
+          "@value": "XFE IP Risk Score"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    }
+  ]
+}
