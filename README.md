@@ -1,6 +1,6 @@
 # Graylog Content Packs
 
-This repository contains various content packs I have created and want to share with the community:
+This repository contains various content packs I have created and want to share with the community.
 
 ## XFE IP Risk Score
 ### Details
