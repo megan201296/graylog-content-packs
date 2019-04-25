@@ -5,9 +5,9 @@ This repository contains various content packs I have created and want to share 
 ## XFE IP Risk Score
 ### Details
 **Filename**: `xfe-ip-risk-score.json`
-**Description**: Performs an API lookup against an IP and returns the risk score calculated by [X-Force Exchange](https://exchange.xforce.ibmcloud.com)
-**Requirements**: X-Force Exchange IP Key
-**Parameters**: auth_header
+**Description**: Performs an API lookup against an IP and returns the risk score calculated by [X-Force Exchange](https://exchange.xforce.ibmcloud.com)   
+**Requirements**: X-Force Exchange IP Key    
+**Parameters**: auth_header  
 
 ### Notes
 **Creating the auth_header value**
