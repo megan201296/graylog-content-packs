@@ -2,6 +2,19 @@
 
 This repository contains various content packs I have created and want to share with the community.
 
+## GeoIP Lookup
+### Details
+- **Filename**: `geoip-lokup.json` 
+- **Description**: Check source and destination IPs for geolocation and set associated fields 
+- **Requirements**: MaxMind GeoLite2 City Database    
+- **Parameters**: `maxmind_db` (path to maxmind db on Graylog server; default: `/etc/graylog/server/GeoLite2-City.mmdb`
+
+### Notes
+**Content Pack Entities**
+- Lookup adapter, cache, and table for getting MaxMind data.
+- `dst_ip RFC1918` and `src_ip RFC1918` pipeline rules (must come before the geoip lookup rules but after normalizations and should be edited to use whatever you normalize the destination and source IP fields to)
+- `src_ip geoip lookup` and `dst_ip geoip lookup` pipeline rules (should be edited to use whatever you normalize the destination and source IP fields to)
+
 ## XFE IP Risk Score
 ### Details
 - **Filename**: `xfe-ip-risk-score.json` 
