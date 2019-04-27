@@ -1,0 +1,285 @@
+{
+  "v": 1,
+  "id": "cd325801-9802-42d3-8244-e6247fb89dd6",
+  "rev": 1,
+  "name": "GeoIP",
+  "summary": "GeoIP Lookups",
+  "description": "GeoIP lookup tables and associated pipeline rules.",
+  "vendor": "megansroddie@gmail.com",
+  "url": "",
+  "parameters": [
+    {
+      "name": "maxmind_db",
+      "title": "MaxMind DB Location",
+      "description": "Location of MaxMind DB on Graylog Server",
+      "type": "string",
+      "default_value": "/etc/graylog/server/GeoLite2-City.mmdb"
+    }
+  ],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_cache",
+        "version": "1"
+      },
+      "id": "9989ce6d-2661-451b-bb41-ceb4ecd6bed5",
+      "data": {
+        "name": {
+          "@type": "string",
+          "@value": "geoip"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "GeoIP"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "GeoIP Lookup"
+        },
+        "configuration": {
+          "type": {
+            "@type": "string",
+            "@value": "guava_cache"
+          },
+          "max_size": {
+            "@type": "integer",
+            "@value": 1000
+          },
+          "expire_after_access": {
+            "@type": "long",
+            "@value": 60
+          },
+          "expire_after_access_unit": {
+            "@type": "string",
+            "@value": "SECONDS"
+          },
+          "expire_after_write": {
+            "@type": "long",
+            "@value": 0
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_adapter",
+        "version": "1"
+      },
+      "id": "f5c4444d-dbd6-4ffd-9716-ceaa783518ef",
+      "data": {
+        "name": {
+          "@type": "string",
+          "@value": "geoip"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "GeoIP"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "Geolocation for IPs"
+        },
+        "configuration": {
+          "type": {
+            "@type": "string",
+            "@value": "maxmind_geoip"
+          },
+          "path": {
+            "@value": "maxmind_db",
+            "@type": "parameter"
+          },
+          "database_type": {
+            "@type": "string",
+            "@value": "MAXMIND_CITY"
+          },
+          "check_interval": {
+            "@type": "long",
+            "@value": 1
+          },
+          "check_interval_unit": {
+            "@type": "string",
+            "@value": "MINUTES"
+          }
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "eabc36f6-641d-4458-87e5-7b86961f4a5f",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "dst_ip RFC1918"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"dst_ip RFC1918\"\nwhen\n  has_field(\"dst_ip\")\nthen\n  set_field(\"dst_ip_is_internal\", in_private_net(to_string($message.dst_ip)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "5abc76ce-a106-4e94-8a7d-5efd83a93ed4",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "src_ip RFC1918"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"src_ip RFC1918\"\nwhen\n  has_field(\"src_ip\")\nthen\n  set_field(\"src_ip_is_internal\", in_private_net(to_string($message.src_ip)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "lookup_table",
+        "version": "1"
+      },
+      "id": "75495be9-74b3-4dce-87b5-2a4ea03e8af5",
+      "data": {
+        "default_single_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "cache_name": {
+          "@type": "string",
+          "@value": "9989ce6d-2661-451b-bb41-ceb4ecd6bed5"
+        },
+        "name": {
+          "@type": "string",
+          "@value": "geoip"
+        },
+        "default_multi_value_type": {
+          "@type": "string",
+          "@value": "NULL"
+        },
+        "default_multi_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "data_adapter_name": {
+          "@type": "string",
+          "@value": "f5c4444d-dbd6-4ffd-9716-ceaa783518ef"
+        },
+        "title": {
+          "@type": "string",
+          "@value": "GeoIP"
+        },
+        "default_single_value": {
+          "@type": "string",
+          "@value": ""
+        },
+        "description": {
+          "@type": "string",
+          "@value": "GeoIP Lookup for IPs"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "13a56915-4aac-4b7b-93a5-15da2bae7fce",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "src_ip geoip lookup"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"src_ip geoip lookup\"\nwhen\n  has_field(\"src_ip_is_internal\") && $message.dst_ip_is_internal == false\nthen\n  let geo = lookup(\"geoip\", to_string($message.dst_ip));\n  set_field(\"dst_ip_geolocation\", geo[\"coordinates\"]);\n  set_field(\"dst_ip_geo_country_code\", geo[\"country\"].iso_code);\n  set_field(\"dst_ip_geo_country_name\", geo[\"country\"].names.en);\n  set_field(\"dst_ip_geo_city_name\", geo[\"city\"].names.en);\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "c485b9bd-a735-49c1-b3e4-ec6b557303c6",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "dst_ip geoip lookup"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"dst_ip geoip lookup\"\nwhen\n  has_field(\"dst_ip_is_internal\") && $message.dst_ip_is_internal == false\nthen\n  let geo = lookup(\"geoip\", to_string($message.dst_ip));\n  set_field(\"dst_ip_geolocation\", geo[\"coordinates\"]);\n  set_field(\"dst_ip_geo_country_code\", geo[\"country\"].iso_code);\n  set_field(\"dst_ip_geo_country_name\", geo[\"country\"].names.en);\n  set_field(\"dst_ip_geo_city_name\", geo[\"city\"].names.en);\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    }
+  ]
+}
