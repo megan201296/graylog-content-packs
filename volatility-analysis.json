@@ -1,0 +1,299 @@
+{
+  "v": "1",
+  "id": "961eb280-3437-4833-8ecd-b5e7881f6041",
+  "rev": 2,
+  "name": "Volatility Analysis",
+  "summary": "Volatility Analysis",
+  "description": "",
+  "vendor": "Megan Roddie - megansroddie@gmail.com",
+  "url": "https://github.com/megan201296/graylog-content-packs",
+  "parameters": [],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline",
+        "version": "1"
+      },
+      "id": "7b8a590d-168e-46d1-a80b-511e39fdb51a",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "Volatility"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "pipeline \"Volatility\"\nstage 5 match either\nrule \"suspicious dll names\"\nrule \"suspicious process names\"\nrule \"suspicious process parent names\"\nstage 0 match either\nrule \"volatility stream\"\nrule \"volatility getsids normalize\"\nrule \"volatility pslist normalize\"\nrule \"volatility dlllist normalize\"\nrule \"volatility connscan normalize\"\nrule \"volatility malfind normalize\"\nrule \"volatility userassist normalize\"\nend"
+        },
+        "connected_streams": [
+          {
+            "@type": "string",
+            "@value": "adfc78e4-8664-40a8-acb8-ac55c66a9aa2"
+          }
+        ]
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "de1d047a-84e0-41b1-a84a-9364721c3196",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "volatility connscan normalize"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"volatility connscan normalize\"\nwhen\n    to_string($message.plugin) == \"connscan\"\nthen\n\n    let source = split(\":\", to_string($message.LocalAddress));\n    set_field(\"src_ip\", source[0]);\n    set_field(\"src_port\", source[1]);\n    remove_field(\"LocalAddress\");\n\n    let dest = split(\":\", to_string($message.RemoteAddress));\n    set_field(\"dst_ip\", dest[0]);\n    set_field(\"dst_port\", dest[1]);\n    remove_field(\"RemoteAddress\");\n\n    rename_field(\"PID\", \"pid\");\n    \n    let concat_0 = concat(\"connscan plugin found process with pid \", to_string($message.pid));\n    let concat_1 = concat(concat_0, \" with connection from \");\n    let concat_2 = concat(concat_1, to_string($message.src_ip));\n    let concat_3 = concat(concat_2, \" to \");\n    let concat_4 = concat(concat_3, to_string($message.dst_ip));\n\n    set_field(\"message\", concat_4);\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "57f1d69a-7b67-4ec2-9ffb-02fe1a359227",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "volatility pslist normalize"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"volatility pslist normalize\"\nwhen\n    to_string($message.plugin) == \"pslist\"\nthen\n    rename_field(\"Hnds\", \"handle_count\");\n    rename_field(\"Name\", \"process_name\");\n    rename_field(\"PID\", \"pid\");\n    rename_field(\"PPID\", \"ppid\");\n    rename_field(\"Start\", \"process_start_time\");\n    rename_field(\"Thds\", \"thread_count\");\n    rename_field(\"TypicalServices\", \"typical_service_name\");\n    rename_field(\"PotentiallyMaliciousProcess\", \"potentially_malicious\");\n    \n    set_field(\"process_name\",lowercase(to_string($message.process_name)));\n    \n    set_field(\"message\", concat(\"pslist plugin found process with name \", to_string($message.process_name)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "53b3f78c-1d9b-4a01-a44c-f067e1d013c0",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "suspicious dll names"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"suspicious dll names\"\nwhen\n    has_field(\"dll_path\") &&\n    (contains(to_string($message.dll_path), \"tabcteng.dll\") ||\n    contains(to_string($message.dll_path), \"svchost.dll\") ||\n    regex(\".*\\\\\\\\.{1}\\\\.dll\", to_string($message.dll_path)).matches == true)\nthen\n    set_field(\"potentially_malicious\", \"True\");\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "6be9c70c-f908-470d-83f9-c65edef57365",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "suspicious process parent names"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"suspicious process parent names\"\nwhen\n    has_field(\"process_parent\") &&\n    (contains(to_string($message.process_parent), \"sp0olsv.exe\") ||\n    contains(to_string($message.process_parent), \"spo0lsv.exe\") ||\n    contains(to_string($message.process_parent), \"svchosts.exe\") ||\n    contains(to_string($message.process_parent), \"svch0st.exe\") ||\n    contains(to_string($message.process_parent), \"winsrv.exe\") ||\n    regex(\".*\\\\\\\\.{1}\\\\.exe\", to_string($message.process_parent)).matches == true)\nthen\n    set_field(\"potentially_malicious\", \"True\");\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "8a083d74-156d-4884-ad7e-be0761141388",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "suspicious process names"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"suspicious process names\"\nwhen\n    has_field(\"process_name\") &&\n    (contains(to_string($message.process_name), \"sp0olsv.exe\") ||\n    contains(to_string($message.process_name), \"spo0lsv.exe\") ||\n    contains(to_string($message.process_name), \"svchosts.exe\") ||\n    contains(to_string($message.process_name), \"svch0st.exe\") ||\n    contains(to_string($message.process_name), \"winsrv.exe\") ||\n    regex(\".*\\\\\\\\.{1}\\\\.exe\", to_string($message.process_name)).matches == true)\nthen\n    set_field(\"potentially_malicious\", \"True\");\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "adc12f91-da82-44ae-9323-577edece7320",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "volatility userassist normalize"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"volatility userassist normalize\"\nwhen\n    to_string($message.plugin) == \"userassist\"\nthen\n    rename_field(\"Count\", \"count\");\n    rename_field(\"FocusCount\", \"focus_count\");\n    rename_field(\"ID\", \"id\");\n    rename_field(\"LastUpdated\", \"last_updated\");\n    rename_field(\"LastWrite\", \"last_write\");\n    rename_field(\"Path\", \"registry_path\");\n    rename_field(\"Registry\", \"registry\");\n    rename_field(\"TimeFocused\", \"time_focused\");\n    rename_field(\"Value\", \"value\");\n\n    set_field(\"process_name\",lowercase(to_string($message.process_name)));\n    \n    set_field(\"message\", concat(\"userassist plugin found value \", to_string($message.value)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "23ed399f-6a06-4313-aa85-a604e6937dcc",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "volatility malfind normalize"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"volatility malfind normalize\"\nwhen\n    to_string($message.plugin) == \"malfind\"\nthen\n    rename_field(\"Process\", \"process_name\");\n    rename_field(\"Address\", \"address\");\n    rename_field(\"Flags\", \"flags\");\n    rename_field(\"Data\", \"data\");\n    rename_field(\"Pid\", \"pid\");\n    rename_field(\"Protection\", \"protection\");\n    rename_field(\"PotentiallyMaliciousProcess\", \"potentially_malicious\");\n    \n    set_field(\"process_name\",lowercase(to_string($message.process_name)));\n    set_field(\"potentially_malicious\", \"True\");\n    \n    set_field(\"message\", concat(\"malfind plugin flagged process with pid \", to_string($message.pid)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "32c56562-7365-44b4-90c1-8664100048d3",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "volatility dlllist normalize"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"volatility dlllist normalize\"\nwhen\n    to_string($message.plugin) == \"dlllist\"\nthen\n    rename_field(\"Base\", \"base\");\n    rename_field(\"LoadCount\", \"load_count\");\n    rename_field(\"ParentImage\", \"process_parent\");\n    rename_field(\"Path\", \"dll_path\");\n    rename_field(\"Pid\", \"pid\");\n    rename_field(\"Size\", \"size\");\n    \n    set_field(\"process_parent\",lowercase(to_string($message.process_parent)));\n    set_field(\"dll_path\",lowercase(to_string($message.dll_path)));\n    \n    set_field(\"message\", concat(\"dlllist plugin found dll with path \", to_string($message.dll_path)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    },
+    {
+      "v": "1",
+      "type": {
+        "name": "pipeline_rule",
+        "version": "1"
+      },
+      "id": "711bf33f-f6d3-47f5-a808-62381c840ec7",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "volatility getsids normalize"
+        },
+        "description": {
+          "@type": "string",
+          "@value": ""
+        },
+        "source": {
+          "@type": "string",
+          "@value": "rule \"volatility getsids normalize\"\nwhen\n    to_string($message.plugin) == \"getsids\"\nthen\n    rename_field(\"Name\", \"username\");\n    rename_field(\"PID\", \"pid\");\n    rename_field(\"Process\", \"process_name\");\n    rename_field(\"SID\", \"sid\");\n\n    set_field(\"process_name\",lowercase(to_string($message.process_name)));\n    \n    set_field(\"message\", concat(\"getsids plugin found SID \", to_string($message.sid)));\nend"
+        }
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.0.1+de74b68"
+        }
+      ]
+    }
+  ]
+}
