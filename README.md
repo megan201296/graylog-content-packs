@@ -15,6 +15,19 @@ This repository contains various content packs I have created and want to share 
 - `dst_ip RFC1918` and `src_ip RFC1918` pipeline rules (must come before the geoip lookup rules but after normalizations and should be edited to use whatever you normalize the destination and source IP fields to)
 - `src_ip geoip lookup` and `dst_ip geoip lookup` pipeline rules (should be edited to use whatever you normalize the destination and source IP fields to)
 
+## Volatility Analysis
+### Details
+- **Filename**: `volatility-analysis.json` 
+- **Description**: See: https://medium.com/@megansroddie/volatility-analysis-with-graylog-ffb7048c4e76
+- **Requirements**: See: https://github.com/megan201296/vol2graylog   
+- **Parameters**: N/A
+
+### Notes
+**Recommendations**
+- I recommend creating a "Volatility" stream and then creating a pipeline rule to redirect any messages from your Volatility input to that stream.
+**Content Pack Entities**
+- Pipeline with various rules to normalize and enrich Volatility results.
+
 ## XFE IP Risk Score
 ### Details
 - **Filename**: `xfe-ip-risk-score.json` 
