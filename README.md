@@ -24,7 +24,8 @@ This repository contains various content packs I have created and want to share 
 
 ### Notes
 **Recommendations**
-- I recommend creating a "Volatility" stream and then creating a pipeline rule to redirect any messages from your Volatility input to that stream.
+- I recommend creating a "Volatility" stream and then creating a pipeline rule to redirect any messages from your Volatility input to that stream.  
+
 **Content Pack Entities**
 - Pipeline with various rules to normalize and enrich Volatility results.
 
